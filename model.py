@@ -23,6 +23,25 @@ class ModelArgs:
 
     device: str = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+def precompute_theeta_pos_frequencies(head_dim: int, seq_len:int, device:str, theeta: float=10000.0):
+
+    assert head_dim % 2 == 0, "head_dim must be even"
+    # build the theeta values ^ (-2(i-1)/dim) for i in [1, dim//2]
+    # According the the formula theeta_i: 10000 
+    # shape: (head_dim//2)
+    theeta_numerator = torch.arrange(0,head_dim,2).float() 
+    # shape: (head_dim//2)
+    theeta = 1.0 / (theeta ** (theeta_numerator / head_dim)).to(device)
+    #construct the positions ( the "m" parameters)
+    # shape: (seq_len)
+    m =  torch.arange(seq_len,device=device)
+    # multiply each theetha with each position using outer product
+    # shape: (seq_len) outer (head_dim/2) -> (seq_len, head_dim/2)
+    freqs = torch.outer(m,theeta).float()
+    # we want to compute complex number using euler's formula in polar form
+    # (seq_len, head_dim/2) -> (seq_len, head_dim/2, 2)
+    freqs_complex = torch.polar(torch.ones_like(freqs), freqs)
+    return freqs_complex
 
 class Transformer(nn.Module):
     def __init__(self, args: ModelArgs) -> None:
