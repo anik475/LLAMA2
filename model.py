@@ -93,7 +93,7 @@ class FeedForward(nn.Module):
         if args.ffn_dim_multiplier is not None:
             hidden_dim = int(args.ffn_dim_multiplier * args.dim)
         #round off
-        hidden = args.multiple_of * ((hidden + args.multiple_of - 1) // args.multiple_of)
+        hidden_dim = args.multiple_of * ((hidden_dim + args.multiple_of - 1) // args.multiple_of)
         
         self.w1 = nn.Linear(args.dim, hidden_dim,bias=False)
         self.w2 = nn.Linear(hidden_dim, args.dim, bias=False)
