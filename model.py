@@ -83,6 +83,33 @@ class RMSNorm(nn.Module):
         # (dim) * (B, seq_len, dim) -> (B, seq_len, dim)
         return self.weight * self._norm(x.float()).type_as(x)
     
+class FeedForward(nn.Module):
+
+    def __init__(self, args: ModelArgs):
+        super().__init__()
+
+        hidden_dim = 4 * args.dim
+        hidden_dim = int(2 * hidden_dim /3)
+        if args.ffn_dim_multiplier is not None:
+            hidden_dim = int(args.ffn_dim_multiplier * args.dim)
+        #round off
+        hidden = args.multiple_of * ((hidden + args.multiple_of - 1) // args.multiple_of)
+        
+        self.w1 = nn.Linear(args.dim, hidden_dim,bias=False)
+        self.w2 = nn.Linear(hidden_dim, args.dim, bias=False)
+        self.w3 = nn.Linear(args.dim, hidden_dim, bias=False)
+
+    def forward(self, x: torch.Tensor):
+        swish = F.silu(self.w1(x))
+        x_v = self.w3(x)
+        x = swish*x_v
+        x = self.w2(x)
+        return x
+
+
+
+
+
 
 class EndcoderBlock(nn.Module):
 
@@ -129,7 +156,7 @@ class SelfAttention(nn.Module):
         self.cache_k = torch.zeros((args.max_batch_size, args.max_seq_len, self.n_kv_heads, self.head_dim))
         self.cache_v = torch.zeros((args.max_batch_size, args.max_seq_len, self.n_kv_heads, self.head_dim))
 
-    
+    #Grouped Querry Attention
     def forward(self,x:torch.Tensor, start_pos:int, freqs_complex:torch.Tensor):
         
         batch_size, seq_len, _ = x.shape #(B,1,Dim)
@@ -174,17 +201,6 @@ class SelfAttention(nn.Module):
 
         output = (output.transpose(1,2).contiguous().view(batch_size, seq_len,-1))
         return self.wo(output) 
-
-
-
-
-
-
-
-
-
-
-
 
 
 class Transformer(nn.Module):
