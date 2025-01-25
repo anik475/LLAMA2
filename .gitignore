@@ -26,7 +26,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-llama2/Lib/site-packages/
+gpu_env/Lib/site-packages/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -131,7 +131,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-llama2/
+gpu_env/
 llama-2-7b/
 
 # Llama Model Files and Directories
