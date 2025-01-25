@@ -107,10 +107,6 @@ class FeedForward(nn.Module):
         return x
 
 
-
-
-
-
 class EndcoderBlock(nn.Module):
 
     def __init__(self, args: ModelArgs):
@@ -212,14 +208,13 @@ class Transformer(nn.Module):
         self.args = args
         self.vocab_size = args.vocab_size
         self.nn_layers = args.n_layers
-        self.tok_embeddibgs = nn.Embedding(self.vocab_size, args.dim)
-        
+        self.tok_embeddings = nn.Embedding(self.vocab_size, args.dim)        
         self.layers = nn.ModuleList([])
         for _ in range(args.n_layers):
             self.layers.append(EndcoderBlock(args))
         
         self.norm = RMSNorm(args.dim, eps=args.norm_eps)
-        self.output - nn.Linear(args.dim, self.vocab_size, bias=False)
+        self.output = nn.Linear(args.dim, self.vocab_size, bias=False)
 
         self.freqs_complex = precompute_theeta_pos_frequencies(self.args.dim//self.args.n_heads, self.args.max_seq_len * 2, device=self.args.device)
 
