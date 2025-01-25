@@ -29,7 +29,7 @@ def precompute_theeta_pos_frequencies(head_dim: int, seq_len:int, device:str, th
     # build the theeta values ^ (-2(i-1)/dim) for i in [1, dim//2]
     # According the the formula theeta_i: 10000 
     # shape: (head_dim//2)
-    theeta_numerator = torch.arrange(0,head_dim,2).float() 
+    theeta_numerator = torch.arange(0,head_dim,2).float() 
     # shape: (head_dim//2)
     theeta = 1.0 / (theeta ** (theeta_numerator / head_dim)).to(device)
     #construct the positions ( the "m" parameters)
@@ -88,7 +88,7 @@ class FeedForward(nn.Module):
     def __init__(self, args: ModelArgs):
         super().__init__()
 
-        hidden_dim = 4 * args.dim
+        hidden_dim = 4 * args.dim # 4 will be m ( multiplier)
         hidden_dim = int(2 * hidden_dim /3)
         if args.ffn_dim_multiplier is not None:
             hidden_dim = int(args.ffn_dim_multiplier * args.dim)
