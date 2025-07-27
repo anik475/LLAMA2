@@ -2,6 +2,7 @@
 Coding LLAMA 2 from Scratch in Pytorch
 
 Architecture
+
 <img width="344" height="432" alt="LLAMA2Arc" src="https://github.com/user-attachments/assets/f9a6fd22-49fe-449a-ba36-fcc82e6cae3b" />
 
 Result
